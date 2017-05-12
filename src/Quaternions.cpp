@@ -188,11 +188,11 @@ int calcQuaternions(Attitude equatorial,int cameraSerial,float YawLeft,float Pit
 		cout << "PitchRight = " << PitchRight << "\n";
 		cout << "RollRight = " << RollRight << "\n";
 	}
-	Quaternion<double> qdYaw(0.0,0.0,sin(dYaw/2.0),cos(dYaw/2.0));
+	Quaternion<double> qdYaw(0.0,0.0,sin(-dYaw/2.0),cos(dYaw/2.0));
 	Quaternion<double> qdPitch(0.0,sin(dPitch/2.0),0.0,cos(dPitch/2.0));
-	Quaternion<double> qdRoll(sin(dRoll/2.0),0.0,0.0,cos(dRoll/2.0));
+	Quaternion<double> qdRoll(sin(-dRoll/2.0),0.0,0.0,cos(dRoll/2.0));
 	Quaternion<double> qI2Starcam = qROLL*(qDEC*qRA);
-	Quaternion<double> qStarcam2Gyros = qdRoll*(qdPitch*qdYaw);
+	Quaternion<double> qStarcam2Gyros = qdYaw*(qdPitch*qdRoll);
 	Quaternion<double> qI2Gyros;
 	qI2Gyros= qStarcam2Gyros * qI2Starcam;
 
@@ -204,7 +204,7 @@ int calcQuaternions(Attitude equatorial,int cameraSerial,float YawLeft,float Pit
 	Quaternion<double> qtPitch(0.0,sin(tPitch/2.0),0.0,cos(tPitch/2.0));
 	Quaternion<double> qtRoll(sin(tRoll/2.0),0.0,0.0,cos(tRoll/2.0));
 
-	Quaternion<double> qGyros2Telescope = qtYaw*(qtPitch*qtRoll);
+	Quaternion<double> qGyros2Telescope = qtRoll*(qtPitch*qtYaw);
 	Quaternion<double> qI2Telescope = qGyros2Telescope*qI2Gyros;
 	Attitude att = qI2Telescope.toAtt();
 	/*cout << "qRA quaternion: " << qRAb << "\n";
@@ -261,9 +261,9 @@ int main() {
 //	float PitchRight=45.4472;
 //	float RollRight=-0.2914;
 
-	float YawRight=-3;
+	float YawRight=3;
 	float PitchRight=50;
-	float RollRight=-2;
+	float RollRight=2;
 
 	calcQuaternions(equatorial,cameraSerial,YawLeft,PitchLeft,RollLeft,YawRight,PitchRight,RollRight);
 	return 0;

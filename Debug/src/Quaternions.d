@@ -1,1 +1,1 @@
-src/Quaternions.o src/Quaternions.o: ../src/Quaternions.cpp
+src/Quaternions.o: ../src/Quaternions.cpp

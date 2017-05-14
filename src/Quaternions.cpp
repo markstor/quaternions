@@ -31,21 +31,22 @@ struct Attitude
 template<class _Tp>
 class Quaternion
 {
-	public:
-		Quaternion(void);
-		~Quaternion();
-		Quaternion(_Tp X, _Tp Y, _Tp Z, _Tp W);//: x(X),y(Y),z(Z),w(W) {}
-		Quaternion(const Quaternion<_Tp>& p);
-		/*void CreateFromAxisAngle(	const double &in_x,
+public:
+	Quaternion(void);
+	~Quaternion();
+	Quaternion(_Tp X, _Tp Y, _Tp Z, _Tp W);//: x(X),y(Y),z(Z),w(W) {}
+	Quaternion(const Quaternion<_Tp>& p);
+	/*void CreateFromAxisAngle(	const double &in_x,
 						const double &in_y,
 						const double &in_y,
 						const double &in_radians);*/
-		Quaternion<_Tp> operator*(const Quaternion<_Tp> & p);
-		Quaternion<_Tp> operator=(const Quaternion<_Tp> & p);
-		//std::ostream &operator <<(std:ostream &os, Quaternion const &q);
-		Quaternion<_Tp> inv();
-		Attitude toAtt();
-		_Tp x,y,z,w;
+	Quaternion<_Tp> operator*(const Quaternion<_Tp> & p);
+	Quaternion<_Tp> operator=(const Quaternion<_Tp> & p);
+	//std::ostream &operator <<(std:ostream &os, Quaternion const &q);
+	Quaternion<_Tp> inv();
+	Attitude toAtt();
+	void print();
+	_Tp x,y,z,w;
 };
 
 #endif
@@ -56,7 +57,7 @@ class Quaternion
 template<class _Tp>
 Quaternion<_Tp>::Quaternion(void)
 {
-x=0.0;y=0.0;z=0.0;w=0.0;
+	x=0.0;y=0.0;z=0.0;w=0.0;
 }
 
 template<class _Tp>
@@ -69,30 +70,30 @@ Quaternion<_Tp>::~Quaternion()
 template<class _Tp>
 Quaternion<_Tp>::Quaternion(_Tp X, _Tp Y, _Tp Z, _Tp W)
 {
-x=X;
-y=Y;
-z=Z;
-w=W;
+	x=X;
+	y=Y;
+	z=Z;
+	w=W;
 }
 
 
 template<class _Tp>
 Quaternion<_Tp>::Quaternion(const Quaternion<_Tp>& p)
 {
-x=p.x;
-y=p.y;
-z=p.z;
-w=p.w;
+	x=p.x;
+	y=p.y;
+	z=p.z;
+	w=p.w;
 }
 
 template<class _Tp>
 Quaternion<_Tp> Quaternion<_Tp>::operator = (const Quaternion<_Tp>& p)
 {
-w=p.w;
-x=p.x;
-y=p.y;
-z=p.z;
-return (*this);
+	w=p.w;
+	x=p.x;
+	y=p.y;
+	z=p.z;
+	return (*this);
 }
 
 // Note the particular order of multiplications and additions - see MjR's thesis for more details (appendices)
@@ -108,10 +109,10 @@ Quaternion<_Tp> Quaternion<_Tp>::operator * (const Quaternion<_Tp>& p)
 	_Tp p3 = p.z;
 	_Tp p4 = p.w;
 	return Quaternion(
-	 q4*p1+q3*p2-q2*p3+q1*p4,
-	 -q3*p1+q4*p2+q1*p3+q2*p4,
-	 q2*p1-q1*p2+q4*p3+q3*p4,
-	 -q1*p1-q2*p2-q3*p3+q4*p4);
+			q4*p1+q3*p2-q2*p3+q1*p4,
+			-q3*p1+q4*p2+q1*p3+q2*p4,
+			q2*p1-q1*p2+q4*p3+q3*p4,
+			-q1*p1-q2*p2-q3*p3+q4*p4);
 }
 
 template<class _Tp>
@@ -139,20 +140,122 @@ Attitude Quaternion<_Tp>::toAtt()
 	att.roll=atan2(xb,xa);
 	if (att.roll<0) att.roll+=2*PI;
 	if (att.ra<0) att.ra+=2*PI;
-    //cout << "xn = " << xn << "\n";
+	//cout << "xn = " << xn << "\n";
 	att.dec=asin(xn);
 	return att;
 }
 
-
+template<class _Tp>
+void Quaternion<_Tp>::print()
+{
+cout << "\nQuaternion:\n";
+cout << "qr = " << w << "\n";
+cout << "qi = " << x << "\n";
+cout << "qj = " << y << "\n";
+cout << "qk = " << z << "\n";
+cout << "RA = " << this->toAtt().ra*180./PI << " deg\n";
+cout << "DEC = " << this->toAtt().dec*180./PI << " deg\n";
+cout << "ROLL = " << this->toAtt().roll*180./PI << " deg\n";
+}
 /* End of quaternion class */
 
 
 
+void test(){
+
+	int yaw = 3 ;
+	int pitch = -44;
+	int roll = 0.1;
+
+	int caso = 0;
+
+	if(caso == 0){
+		//Three rotations one after the other
+
+		Quaternion<double> qYAW(0.0,0.0,sin(-yaw/2.0),cos(-yaw/2.0));
+		Quaternion<double> qPITCH(0.0,sin(-pitch/2.0),0.0,cos(-pitch/2.0));
+		Quaternion<double> qROLL(sin(-roll/2.0),0.0,0.0,cos(-roll/2.0));
+		Quaternion<double> qConsecutiveRotations = qYAW*(qPITCH*qROLL);
+
+		cout << "\nRotation Quaternion -roll * - pitch * - yaw\n";
+		cout << "qr = " << qConsecutiveRotations.w << "\n";
+		cout << "qi = " << qConsecutiveRotations.x << "\n";
+		cout << "qj = " << qConsecutiveRotations.y << "\n";
+		cout << "qk = " << qConsecutiveRotations.z << "\n";
+		qConsecutiveRotations = qConsecutiveRotations.inv();
+		cout << "Ra = " << qConsecutiveRotations.toAtt().ra*180./PI << " Dec = " << qConsecutiveRotations.toAtt().dec*180./PI << "\n";
+
+
+		qYAW = Quaternion<double> (0.0,0.0,sin(-yaw/2.0),cos(-yaw/2.0));
+		qPITCH = Quaternion<double> (0.0,sin(-pitch/2.0),0.0,cos(-pitch/2.0));
+		qROLL = Quaternion<double> (0,0.0,0.0,1);
+		 qConsecutiveRotations = (qYAW * qPITCH);
+
+		qROLL = Quaternion<double> (sin(-roll/2.0),0.0,0.0,cos(-roll/2.0));
+		qConsecutiveRotations = qROLL * qConsecutiveRotations;
 
 
 
+		cout << "\nRotation Quaternion -pitch * -yaw and 0 roll. Then -roll\n";
+		cout << "qr = " << qConsecutiveRotations.w << "\n";
+		cout << "qi = " << qConsecutiveRotations.x << "\n";
+		cout << "qj = " << qConsecutiveRotations.y << "\n";
+		cout << "qk = " << qConsecutiveRotations.z << "\n";
+		cout << "Ra = " << qConsecutiveRotations.toAtt().ra*180./PI << " Dec = " << qConsecutiveRotations.toAtt().dec*180./PI << "\n";
 
+
+	}
+
+
+}
+
+
+Quaternion<double> DCM2Quat(double (&matrix)[3][3]){
+	double trace = matrix [0][0] + matrix [1][1] +matrix [2][2];
+	double sr;
+	double sr2;
+	double x,y,z,r;
+
+	if(trace > 0){ // positive trace
+		sr = sqrt(1 + trace);
+		sr2 = 2*sr;
+		x = (matrix[1][2] - matrix[2][1]) / sr2;
+		y = (matrix[2][0] - matrix[0][2]) / sr2;
+		z = (matrix[0][1] - matrix[1][0]) / sr2;
+		r = 0.5* sr;
+	}
+	else{ //negative trace
+		if((matrix[0][0] > matrix[1][1]) && (matrix[0][0] > matrix[2][2])){
+			//Maximum Value at matrix[0][0]
+		      sr  = sqrt( 1 + (matrix[0][0] - ( matrix[1][1] + matrix[2][2] )) );
+		      sr2 = 2*sr;
+		      x = 0.5 * sr;
+		      y = ( matrix[1][0] + matrix[0][1] ) / sr2;
+		      z = ( matrix[2][0] + matrix[0][2] ) / sr2;
+		      r = ( matrix[1][2] - matrix[2][1] ) / sr2;
+		}
+		else if (matrix[1][1] > matrix[2][2]) {
+		      // Maximum Value at matrix[1][1]
+		      sr  = sqrt( 1 + (matrix[1][1] - ( matrix[2][2] + matrix[0][0] )) );
+		      sr2 = 2*sr;
+		      x = ( matrix[1][0] + matrix[0][1] ) / sr2;
+		      y = 0.5 * sr;
+		      z = ( matrix[1][2] + matrix[2][1] ) / sr2;
+		      r = ( matrix[2][0] - matrix[0][2] ) / sr2;
+		}
+		else{
+		      // Maximum Value at matrix[2][2]
+		      sr  = sqrt( 1 + (matrix[2][2] - ( matrix[0][0] + matrix[1][1] )) );
+		      sr2 = 2*sr;
+		      x = ( matrix[2][0] + matrix[0][2] ) / sr2;
+		      y = ( matrix[1][2] + matrix[2][1] ) / sr2;
+		      z = 0.5 * sr;
+		      r = ( matrix[0][1] - matrix[1][0] ) / sr2;
+		}
+	}
+	return Quaternion<double> (x,y,z,r);
+
+}
 
 int calcQuaternions(Attitude equatorial,int cameraSerial,float YawLeft,float PitchLeft,float RollLeft,float YawRight,float PitchRight,float RollRight) {
 
@@ -163,6 +266,7 @@ int calcQuaternions(Attitude equatorial,int cameraSerial,float YawLeft,float Pit
 	Quaternion<double> qRA(0.0,0.0,sin(equatorial.ra/2.0),cos(equatorial.ra/2.0));
 	Quaternion<double> qDEC(0.0,sin(-equatorial.dec/2.0),0.0,cos(equatorial.dec/2.0));
 	Quaternion<double> qROLL(sin(equatorial.roll/2.0),0.0,0.0,cos(equatorial.roll/2.0));
+
 
 
 	// Elementary quaternions used in determining the quaternion from starcamera to gyro reference frame
@@ -225,11 +329,11 @@ int calcQuaternions(Attitude equatorial,int cameraSerial,float YawLeft,float Pit
 	cout << "qi = " << qI2Starcam.x << "\n";
 	cout << "qj = " << qI2Starcam.y << "\n";
 	cout << "qk = " << qI2Starcam.z << "\n";
-//	cout << "\nInertial2Gyros quaternion:\n";
-//	cout << "qr = " << qI2Gyros.w << "\n";
-//	cout << "qi = " << qI2Gyros.x << "\n";
-//	cout << "qj = " << qI2Gyros.y << "\n";
-//	cout << "qk = " << qI2Gyros.z << "\n";
+	//	cout << "\nInertial2Gyros quaternion:\n";
+	//	cout << "qr = " << qI2Gyros.w << "\n";
+	//	cout << "qi = " << qI2Gyros.x << "\n";
+	//	cout << "qj = " << qI2Gyros.y << "\n";
+	//	cout << "qk = " << qI2Gyros.z << "\n";
 	cout << "\nInertial2Telescope quaternion:\n";
 	cout << "qr = " << qI2Telescope.w << "\n";
 	cout << "qi = " << qI2Telescope.x << "\n";
@@ -257,14 +361,44 @@ int main() {
 	float PitchLeft=46.6729;
 	float RollLeft=-2.1463;
 
-//	float YawRight=-0.0588;
-//	float PitchRight=45.4472;
-//	float RollRight=-0.2914;
+	//	float YawRight=-0.0588;
+	//	float PitchRight=45.4472;
+	//	float RollRight=-0.2914;
 
 	float YawRight=3;
 	float PitchRight=50;
 	float RollRight=2;
 
-	calcQuaternions(equatorial,cameraSerial,YawLeft,PitchLeft,RollLeft,YawRight,PitchRight,RollRight);
+	//calcQuaternions(equatorial,cameraSerial,YawLeft,PitchLeft,RollLeft,YawRight,PitchRight,RollRight);
+	//test();
+
+
+	double eye[3][3] = {
+	  { 1,0,0 },
+	  { 0,1,0 },
+	  { 0,0,1 }
+	};
+
+	double arnabMatrix [3][3] = {
+		{0.686949,      0.00345102,   0.726697 },
+		{-0.00237069,  0.999994,      -0.00250786 },
+		{-0.726701,     0.0,               0.686953}
+
+	};
+
+	RollLeft=-2.1463*PI/180;
+	RollLeft = -RollLeft;
+	Quaternion<double> qR(sin(RollLeft/2.0),0.0,0.0,cos(RollLeft/2.0));
+
+	Quaternion<double> toPrint = DCM2Quat(arnabMatrix);
+	toPrint.print();
+//	Quaternion<double> qToPrintRotated = (qR*toPrint);
+//	qToPrintRotated.print();
+
+	toPrint.inv().print();
+
+	Quaternion<double> qStarcam2Gyros = (qR*toPrint.inv());
+	qStarcam2Gyros.print();
+
 	return 0;
 }

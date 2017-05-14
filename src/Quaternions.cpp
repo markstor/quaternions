@@ -400,5 +400,16 @@ int main() {
 	Quaternion<double> qStarcam2Gyros = (qR*toPrint.inv());
 	qStarcam2Gyros.print();
 
+	double dYaw = 359.802*PI/180;
+	double dPitch = 46.6105*PI/180;
+	double dRoll =  2.1463*PI/180;
+
+	Quaternion<double> qdYawFabricatedQuaternion(0.0,0.0,sin(dYaw/2.0),cos(dYaw/2.0));
+	Quaternion<double> qdPitchFabricatedQuaternion(0.0,sin(dPitch/2.0),0.0,cos(dPitch/2.0));
+	Quaternion<double> qdRollFabricatedQuaternion(sin(dRoll/2.0),0.0,0.0,cos(dRoll/2.0));
+	Quaternion<double> qFabricatedQuaternionStarcamToGyros = qdRollFabricatedQuaternion*qdPitchFabricatedQuaternion*qdYawFabricatedQuaternion;
+
+	qFabricatedQuaternionStarcamToGyros.print();
+
 	return 0;
 }
